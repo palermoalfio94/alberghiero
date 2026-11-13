@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7ff">
+  <title>Trova la destinazione perfetta!</title>
+  <style>
+:root {
+  --ink: #202c48;
+  --muted: #66718a;
+  --purple: #6654dc;
+  --purple-dark: #5040bf;
+  --mint: #daf5e9;
+  --line: #e5e8f2;
+  --paper: #fff;
+  --bg: #f4f6fc;
+  --green: #21865c;
+  --red: #b74343;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 0 18px 32px; color: var(--ink); background: var(--bg); font: 15px/1.55 'Trebuchet MS', Arial, sans-serif; }
+button { font: inherit; }
+.app-shell { max-width: 900px; margin: auto; }
+.topbar { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.brand { color: var(--ink); text-decoration: none; font-weight: 800; display: inline-flex; align-items: center; gap: 9px; }
+.brand:first-letter { font-size: 22px; }
+.class-tag { color: var(--muted); font-size: 12px; font-weight: 700; }
+.hero { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; min-height: 190px; padding: 30px 38px; border-radius: 22px; color: white; background: linear-gradient(115deg, #6253d9, #8875ec); box-shadow: 0 12px 28px #5544bd2b; }
+.hero-copy { position: relative; z-index: 1; max-width: 620px; }
+.eyebrow { margin: 0 0 5px; color: #8a79ec; font-size: 10px; letter-spacing: 1.45px; font-weight: 800; }
+.hero .eyebrow { color: #d9d4ff; }
+h1, h2, p { margin-top: 0; }
+h1, h2 { font-family: 'Trebuchet MS', Arial, sans-serif; }
+h1 { margin-bottom: 7px; font-size: clamp(28px, 5vw, 41px); line-height: 1.12; }
+.hero-copy > p:last-child { max-width: 520px; margin-bottom: 0; color: #eeeaff; }
+.hero-art { position: relative; margin-right: 16px; font-size: 92px; line-height: 1; filter: drop-shadow(0 8px 8px #40339755); }
+.hero-art span { position: absolute; right: -14px; top: 0; font-size: 39px; transform: rotate(-12deg); }
+.game { margin-top: 19px; padding: 22px 26px 26px; border: 1px solid #e9ebf4; border-radius: 19px; background: var(--paper); box-shadow: 0 6px 22px #27385b0c; }
+.progress-label { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; margin-bottom: 7px; color: var(--muted); font-size: 12px; font-weight: 800; }
+#score-live { color: #98721a; }
+.progress-track { height: 8px; overflow: hidden; border-radius: 20px; background: #eeeff7; }
+.progress-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #4bbd91, #86d49e); transition: width .25s ease; }
+.profile-card { margin-top: 21px; padding: 21px 22px 17px; border: 1px solid #e6e7fa; border-radius: 15px; background: linear-gradient(130deg, #fafaff, #fff); }
+.profile-heading { display: flex; align-items: center; gap: 12px; }
+.avatar { width: 52px; height: 52px; display: grid; place-items: center; flex: none; border-radius: 15px; background: #eeecff; font-size: 27px; }
+.profile-heading .eyebrow { margin-bottom: 1px; }
+.profile-heading h2 { margin: 0; font-size: 23px; line-height: 1.2; }
+.profile-story { margin: 14px 0 12px; color: #4e5972; }
+.profile-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.fact-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 1px solid #e9eaf3; border-radius: 30px; background: white; color: #46516a; font-size: 11px; font-weight: 700; }
+.interest-line { display: flex; align-items: flex-start; gap: 9px; margin-top: 9px; }
+.fact-icon { font-size: 17px; }
+.interest-line strong { font-size: 12px; }
+.interest-line p { margin: 1px 0 0; color: var(--muted); font-size: 12px; }
+.needs-line { padding-top: 10px; border-top: 1px solid #eff0f6; }
+.choices-area { margin-top: 24px; }
+.choices-heading { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 12px; }
+.choices-heading .eyebrow { margin-bottom: 2px; }
+.choices-heading h2 { margin: 0; font-size: 21px; }
+.choose-hint { padding-bottom: 2px; color: #9098aa; font-size: 11px; }
+.destination-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; }
+.destination-card { position: relative; min-height: 127px; padding: 14px 12px 12px; border: 2px solid #e9ebf3; border-radius: 13px; background: white; color: var(--ink); text-align: left; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s, background .15s; }
+.destination-card:hover { transform: translateY(-2px); border-color: #b8b1f5; box-shadow: 0 6px 15px #4534a914; }
+.destination-card:focus-visible { outline: 3px solid #8274e8; outline-offset: 2px; }
+.destination-card[aria-pressed="true"] { border-color: var(--purple); background: #f7f5ff; box-shadow: 0 0 0 3px #6654dc16; }
+.destination-card[aria-pressed="true"]::after { content: '✓'; position: absolute; top: 9px; right: 10px; width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: var(--purple); color: white; font-size: 12px; font-weight: 800; }
+.destination-emoji { display: block; margin-bottom: 8px; font-size: 25px; }
+.destination-name { display: block; padding-right: 14px; font-size: 14px; font-weight: 800; line-height: 1.25; }
+.destination-country { display: block; margin-top: 4px; color: #81899a; font-size: 10px; }
+.primary-button, .secondary-button { display: block; min-height: 46px; margin: 17px 0 0 auto; padding: 11px 19px; border: 0; border-radius: 10px; color: white; font-weight: 800; cursor: pointer; transition: background .15s, transform .15s; }
+.primary-button { background: var(--purple); }
+.primary-button:hover:not(:disabled), .secondary-button:hover { transform: translateY(-1px); background: var(--purple-dark); }
+.primary-button:disabled { background: #c8c8d7; cursor: not-allowed; }
+.primary-button:focus-visible, .secondary-button:focus-visible { outline: 3px solid #8a7df0; outline-offset: 3px; }
+.primary-button span { padding-left: 8px; }
+.secondary-button { background: #21865c; }
+.secondary-button:hover { background: #176c49; }
+.feedback { margin: 15px 0 0; padding: 13px 15px; border-radius: 11px; font-size: 13px; font-weight: 600; }
+.feedback.good { border: 1px solid #c4ead6; background: #edfaf2; color: #246848; }
+.feedback.try-again { border: 1px solid #f0ddbd; background: #fff8e9; color: #785d27; }
+.final-card { padding: 36px 25px; border: 1px solid #e7e6fa; border-radius: 16px; background: linear-gradient(145deg, #faf9ff, #f1fbf5); text-align: center; }
+.final-emoji { margin-bottom: 8px; font-size: 55px; }
+.final-card h2 { margin: 5px 0; font-size: clamp(24px, 5vw, 34px); }
+.score-big { margin: 13px 0 0; color: var(--purple); font-family: 'Trebuchet MS', Arial, sans-serif; font-size: 64px; font-weight: 900; line-height: 1; }
+.score-big small { color: #a6a6b7; font-size: 25px; }
+.score-caption { margin: 6px 0 13px; color: var(--ink); }
+.final-message { max-width: 520px; margin: 0 auto; color: var(--muted); }
+footer { padding: 18px 6px 0; color: #8991a3; text-align: center; font-size: 11px; }
+[hidden] { display: none !important; }
+
+@media (max-width: 680px) {
+  body { padding-right: 12px; padding-left: 12px; }
+  .hero { min-height: 165px; padding: 24px; }
+  .hero-art { margin-right: 2px; font-size: 69px; }
+  .hero-art span { right: -9px; font-size: 31px; }
+  .game { padding: 17px 16px 20px; }
+  .destination-grid { grid-template-columns: repeat(2, 1fr); }
+  .destination-card { min-height: 108px; }
+}
+@media (max-width: 430px) {
+  body { padding-right: 9px; padding-left: 9px; }
+  .topbar { height: 59px; }
+  .brand { font-size: 13px; }
+  .class-tag { max-width: 118px; text-align: right; font-size: 10px; }
+  .hero { gap: 5px; padding: 21px 17px; border-radius: 17px; }
+  .hero-art { font-size: 55px; }
+  .hero-copy > p:last-child { font-size: 13px; }
+  .profile-card { padding: 17px 15px 14px; }
+  .choices-heading h2 { font-size: 18px; }
+  .choose-hint { font-size: 10px; }
+  .destination-card { padding: 12px 10px; }
+  .destination-name { font-size: 13px; }
+}
+
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#inizio" aria-label="Trova la destinazione perfetta, inizio">🧭 <span>Destinazione perfetta</span></a>
+      <span class="class-tag">Accoglienza Turistica · Classe prima</span>
+    </header>
+
+    <section class="hero" id="inizio">
+      <div class="hero-copy">
+        <p class="eyebrow">SFIDA DI VIAGGIO</p>
+        <h1>Trova la destinazione perfetta!</h1>
+        <p>Leggi il profilo del turista, valuta le sue esigenze e scegli il viaggio che fa per lui.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">🌍<span>✈️</span></div>
+    </section>
+
+    <section class="game" aria-label="Quiz sulle destinazioni">
+      <div class="progress-area">
+        <div class="progress-label"><span id="progress-text">Turista 1 di 12</span><span id="score-live" aria-live="polite">✅ 0 giuste · ❌ 0 sbagliate</span></div>
+        <div class="progress-track" role="progressbar" aria-label="Avanzamento del quiz" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <article class="profile-card" id="profile-card" aria-live="polite">
+        <div class="profile-heading">
+          <div class="avatar" id="profile-emoji" aria-hidden="true">🧳</div>
+          <div><p class="eyebrow" id="profile-type">PROFILO DEL VIAGGIATORE</p><h2 id="profile-name"></h2></div>
+        </div>
+        <p class="profile-story" id="profile-story"></p>
+        <div class="profile-facts" id="profile-facts"></div>
+        <div class="interest-line"><span class="fact-icon" aria-hidden="true">💡</span><div><strong>Interessi</strong><p id="profile-interests"></p></div></div>
+        <div class="interest-line needs-line"><span class="fact-icon" aria-hidden="true">🧩</span><div><strong>Esigenze da considerare</strong><p id="profile-needs"></p></div></div>
+      </article>
+
+      <section class="choices-area" aria-labelledby="choices-title">
+        <div class="choices-heading"><div><p class="eyebrow">LA TUA SCELTA</p><h2 id="choices-title">Quale destinazione consigli?</h2></div><span class="choose-hint">Scegli una card</span></div>
+        <div class="destination-grid" id="destination-grid"></div>
+        <p class="feedback" id="feedback" role="status" hidden></p>
+        <button class="primary-button" id="confirm-button" type="button" disabled>Conferma la destinazione <span aria-hidden="true">→</span></button>
+        <button class="secondary-button" id="next-button" type="button" hidden>Prossimo turista <span aria-hidden="true">→</span></button>
+      </section>
+
+      <section class="final-card" id="final-card" aria-live="polite" tabindex="-1" hidden>
+        <div class="final-emoji" id="final-emoji" aria-hidden="true">🏆</div>
+        <p class="eyebrow">SFIDA COMPLETATA</p>
+        <h2>Hai trovato la tua rotta!</h2>
+        <div class="score-big"><span id="final-score">0</span><small>/ 12</small></div>
+        <p class="score-caption"><strong id="final-correct">0 destinazioni azzeccate</strong></p>
+        <p class="score-caption" id="final-wrong">0 risposte sbagliate</p>
+        <p class="final-message" id="final-message"></p>
+      </section>
+    </section>
+
+    <footer>Ogni turista è diverso: la destinazione migliore è quella che risponde alle sue preferenze, al budget e alle sue esigenze.</footer>
+  </main>
+  <script>
+'use strict';
+
+const tourists = [
+  {
+    name: 'Lucas', age: 19, origin: 'Germania', budget: '€', duration: '5 giorni', emoji: '🏄', type: 'Giovane turista balneare',
+    story: 'Lucas viaggia con due amici e vuole godersi il mare senza spendere troppo. Gli piace fare nuove conoscenze e la sera cerca un po’ di movimento.',
+    interests: 'Spiaggia, nuotate, locali informali e nuove amicizie.', needs: 'Budget limitato; preferisce spostarsi a piedi o con i mezzi pubblici.',
+    options: [
+      { name: 'Cefalù', country: 'Sicilia · Italia', emoji: '🏖️', correct: true, feedback: 'Ottima scelta! Cefalù offre una bella spiaggia, un centro vivace e dimensioni comode per muoversi senza spendere troppo.' },
+      { name: 'Londra', country: 'Regno Unito', emoji: '🎡', feedback: 'Londra è ricca di attrazioni, ma alloggio e spostamenti possono pesare sul budget. Per Lucas il mare e una vacanza più economica sono priorità.' },
+      { name: 'Cortina d’Ampezzo', country: 'Veneto · Italia', emoji: '🏔️', feedback: 'Cortina è splendida in montagna, ma non risponde al desiderio principale di Lucas: trascorrere giornate al mare.' },
+      { name: 'Firenze', country: 'Toscana · Italia', emoji: '🎨', feedback: 'Firenze è perfetta per l’arte, ma Lucas cerca soprattutto spiaggia, nuotate e serate informali.' }
+    ]
+  },
+  {
+    name: 'Sofia', age: 15, origin: 'Bologna, Italia', budget: '€€', duration: '3 giorni', emoji: '🏛️', type: 'Turista culturale',
+    story: 'Sofia è appassionata di storia e sta organizzando un breve viaggio con la famiglia. Vuole vedere luoghi famosi e imparare curiosità sulla città.',
+    interests: 'Musei, monumenti, arte e passeggiate nel centro storico.', needs: 'Itinerario breve, con attrazioni raggiungibili a piedi.',
+    options: [
+      { name: 'Ibiza', country: 'Isole Baleari · Spagna', emoji: '🎶', feedback: 'Ibiza è nota soprattutto per mare e vita notturna: non è la scelta che meglio rispecchia la curiosità di Sofia per storia e monumenti.' },
+      { name: 'Roma', country: 'Lazio · Italia', emoji: '🏛️', correct: true, feedback: 'Esatto! In tre giorni Sofia può scoprire monumenti e musei famosissimi, come il Colosseo e i Musei Vaticani.' },
+      { name: 'Rimini', country: 'Emilia-Romagna · Italia', emoji: '🌊', feedback: 'Rimini offre mare e divertimento. Per un viaggio dedicato soprattutto a storia, monumenti e musei, Roma è più adatta.' },
+      { name: 'Zermatt', country: 'Svizzera', emoji: '⛰️', feedback: 'Zermatt è una meta alpina spettacolare, ma Sofia vuole visitare musei e monumenti in una città ricca di storia.' }
+    ]
+  },
+  {
+    name: 'Marta', age: 42, origin: 'Parma, Italia', budget: '€€€', duration: '4 giorni', emoji: '🍋', type: 'Turista enogastronomica',
+    story: 'Marta ama conoscere un territorio attraverso i suoi sapori. Viaggia con la sorella e sogna mercati, ricette locali e una cena speciale.',
+    interests: 'Cucina tradizionale, mercati, prodotti locali e ristoranti tipici.', needs: 'Possibilità di fare degustazioni e visite guidate legate al cibo.',
+    options: [
+      { name: 'Palermo', country: 'Sicilia · Italia', emoji: '🍋', correct: true, feedback: 'Scelta azzeccata! A Palermo Marta può esplorare mercati storici, street food e tante ricette della tradizione siciliana.' },
+      { name: 'Amsterdam', country: 'Paesi Bassi', emoji: '🚲', feedback: 'Amsterdam offre ottimi musei e canali, ma il viaggio che Marta immagina ruota soprattutto intorno a mercati e cucina locale.' },
+      { name: 'Courmayeur', country: 'Valle d’Aosta · Italia', emoji: '🎿', feedback: 'Courmayeur è famosa per le montagne e gli sport invernali. Per un itinerario centrato su mercati e cucina regionale, Palermo è più mirata.' },
+      { name: 'Parigi', country: 'Francia', emoji: '🗼', feedback: 'Parigi ha una grande tradizione gastronomica, ma Palermo offre a Marta mercati e street food particolarmente coerenti con l’esperienza che cerca.' }
+    ]
+  },
+  {
+    name: 'Adam', age: 17, origin: 'Praga, Repubblica Ceca', budget: '€€', duration: '6 giorni', emoji: '🥾', type: 'Turista naturalistico',
+    story: 'Adam ama camminare e osservare paesaggi e animali. Vorrebbe staccare dalla città con un amico e passare più tempo possibile all’aria aperta.',
+    interests: 'Sentieri, montagne, panorami, boschi e fotografia naturalistica.', needs: 'Percorsi segnalati e possibilità di scegliere itinerari di difficoltà diversa.',
+    options: [
+      { name: 'Venezia', country: 'Veneto · Italia', emoji: '🚤', feedback: 'Venezia è unica per arte e canali, ma offre meno escursioni in montagna e sentieri naturalistici di quelli che Adam desidera.' },
+      { name: 'Dolomiti', country: 'Italia', emoji: '🏞️', correct: true, feedback: 'Perfetto! Le Dolomiti offrono panorami, sentieri segnalati e percorsi diversi, ideali per esplorare la natura con calma.' },
+      { name: 'Ibiza', country: 'Isole Baleari · Spagna', emoji: '🏝️', feedback: 'Ibiza ha belle spiagge, ma Adam cerca soprattutto escursioni, boschi e paesaggi montani.' },
+      { name: 'Milano', country: 'Lombardia · Italia', emoji: '🏙️', feedback: 'Milano è una meta urbana ricca di cultura e shopping. Per camminate e paesaggi naturali, le Dolomiti rispondono meglio ai suoi interessi.' }
+    ]
+  },
+  {
+    name: 'Giulia', age: 15, origin: 'Bari, Italia', budget: '€€', duration: '2 giorni', emoji: '🖼️', type: 'Turista culturale',
+    story: 'Giulia ama dipingere e vuole vedere dal vivo opere e palazzi di cui ha studiato a scuola. Ha solo un fine settimana a disposizione.',
+    interests: 'Rinascimento, musei d’arte, architettura e disegno.', needs: 'Una meta concentrata, dove molte visite siano vicine tra loro.',
+    options: [
+      { name: 'Taormina', country: 'Sicilia · Italia', emoji: '🌋', feedback: 'Taormina ha un importante teatro antico e bei panorami, ma per un fine settimana dedicato a musei e arte rinascimentale Firenze è più ricca di tappe.' },
+      { name: 'Firenze', country: 'Toscana · Italia', emoji: '🖼️', correct: true, feedback: 'Bravissimo! Firenze concentra capolavori rinascimentali, palazzi e musei: una meta ideale per il weekend artistico di Giulia.' },
+      { name: 'Londra', country: 'Regno Unito', emoji: '🎭', feedback: 'Londra offre grandi musei, ma per l’interesse specifico di Giulia verso il Rinascimento italiano Firenze è una scelta più centrata.' },
+      { name: 'Cefalù', country: 'Sicilia · Italia', emoji: '🌊', feedback: 'Cefalù è ottima per mare e relax. Giulia ha invece chiesto un fine settimana concentrato su arte e Rinascimento.' }
+    ]
+  },
+  {
+    name: 'La famiglia Rossi', age: '2 adulti e 2 bambini (8 e 11 anni)', origin: 'Torino, Italia', budget: '€€', duration: '5 giorni', emoji: '👨‍👩‍👧‍👦', type: 'Turismo in famiglia',
+    story: 'La famiglia Rossi cerca una vacanza con attività adatte a grandi e piccoli. I bambini amano l’acqua e i genitori vorrebbero alternare relax e visite.',
+    interests: 'Spiagge accessibili, attività per bambini e passeggiate facili.', needs: 'Servizi comodi, giornate non troppo impegnative e alternative per tutta la famiglia.',
+    options: [
+      { name: 'Venezia', country: 'Veneto · Italia', emoji: '🛶', feedback: 'Venezia è affascinante, ma scale, ponti e spostamenti possono rendere le giornate più faticose con due bambini.' },
+      { name: 'Cefalù', country: 'Sicilia · Italia', emoji: '🏖️', correct: true, feedback: 'Buona scelta! Cefalù permette di alternare spiaggia, passeggiate nel centro e pause tranquille, con attività che possono piacere a tutta la famiglia.' },
+      { name: 'Roma', country: 'Lazio · Italia', emoji: '🏛️', feedback: 'Roma offre storia e tante visite, ma con due bambini e il desiderio di alternare relax e attività, una località di mare come Cefalù è più adatta.' },
+      { name: 'Ibiza', country: 'Isole Baleari · Spagna', emoji: '🎧', feedback: 'Ibiza ha spiagge, ma alcune zone sono conosciute per la vita notturna. Per alternare mare, passeggiate e giornate familiari, Cefalù è più adatta.' }
+    ]
+  },
+  {
+    name: 'Noah', age: 20, origin: 'Lione, Francia', budget: '€€€', duration: '7 giorni', emoji: '🚴', type: 'Turista sportivo',
+    story: 'Noah fa sport regolarmente e vuole provare attività nuove durante le vacanze. Viaggia con amici e preferisce una meta che offra natura e movimento.',
+    interests: 'Ciclismo, trekking, arrampicata e attività all’aperto.', needs: 'Più attività sportive prenotabili e percorsi per diversi livelli.',
+    options: [
+      { name: 'Dolomiti', country: 'Italia', emoji: '🧗', correct: true, feedback: 'Ottima scelta! Le Dolomiti permettono di abbinare trekking, arrampicata e ciclismo in un paesaggio spettacolare.' },
+      { name: 'Parigi', country: 'Francia', emoji: '🗼', feedback: 'Parigi offre molto da vedere, ma il programma di Noah è centrato su sport e attività outdoor: le Dolomiti offrono più occasioni.' },
+      { name: 'Palermo', country: 'Sicilia · Italia', emoji: '🍝', feedback: 'Palermo è ricca di cultura e sapori. Noah ha però chiesto sentieri e sport all’aperto come protagonisti del viaggio.' },
+      { name: 'Venezia', country: 'Veneto · Italia', emoji: '🚣', feedback: 'A Venezia si può esplorare la laguna, ma per una settimana con trekking, arrampicata e ciclismo le Dolomiti sono più adatte.' }
+    ]
+  },
+  {
+    name: 'Emma', age: 16, origin: 'Dublino, Irlanda', budget: '€€€', duration: '4 giorni', emoji: '🎠', type: 'Turista del divertimento',
+    story: 'Emma viaggia con una cugina e vuole riempire le giornate di attrazioni, spettacoli e cose nuove da provare. Non è interessata a un viaggio tranquillo.',
+    interests: 'Parchi divertimento, spettacoli, attrazioni e attività interattive.', needs: 'Tante attività diverse e collegamenti comodi tra le attrazioni.',
+    options: [
+      { name: 'Firenze', country: 'Toscana · Italia', emoji: '🎨', feedback: 'Firenze è straordinaria per arte e storia, ma Emma desidera soprattutto attrazioni, spettacoli e attività da provare.' },
+      { name: 'Roma', country: 'Lazio · Italia', emoji: '🏛️', feedback: 'Roma ha moltissime visite interessanti, ma il viaggio di Emma punta su un programma pieno di attrazioni e divertimento.' },
+      { name: 'Londra', country: 'Regno Unito', emoji: '🎡', correct: true, feedback: 'Scelta centrata! Londra offre spettacoli, attrazioni, musei interattivi e attività diverse, perfette per riempire quattro giornate.' },
+      { name: 'Dolomiti', country: 'Italia', emoji: '🌲', feedback: 'Le Dolomiti sono ideali per natura e attività outdoor. Emma cerca invece attrazioni e intrattenimento in città.' }
+    ]
+  },
+  {
+    name: 'Mei', age: 18, origin: 'Bologna, Italia', budget: '€', duration: '3 giorni', emoji: '💸', type: 'Turista economica',
+    story: 'Mei vuole fare un viaggio breve con una compagna di scuola, spendendo il meno possibile. Le piacciono le passeggiate urbane, i parchi e le attività gratuite.',
+    interests: 'Centri storici, panorami, parchi e cibo semplice.', needs: 'Trasporti pubblici, molte attività gratuite e possibilità di contenere le spese.',
+    options: [
+      { name: 'Venezia', country: 'Veneto · Italia', emoji: '🚤', feedback: 'Venezia si può visitare a piedi, ma pernottamenti e alcune esperienze possono essere costosi per il budget limitato di Mei.' },
+      { name: 'Firenze', country: 'Toscana · Italia', emoji: '🌉', feedback: 'Firenze si presta a passeggiate, ma alcune visite molto richieste hanno un costo. Mei vuole soprattutto contenere le spese.' },
+      { name: 'Palermo', country: 'Sicilia · Italia', emoji: '🛍️', correct: true, feedback: 'Buona scelta! Palermo offre mercati, piazze e passeggiate interessanti; scegliendo con attenzione alloggio e trasporti, Mei può organizzare un viaggio conveniente.' },
+      { name: 'Amsterdam', country: 'Paesi Bassi', emoji: '🚲', feedback: 'Amsterdam è piacevole da esplorare, ma alloggi e servizi possono essere costosi: non è la scelta più semplice per il budget di Mei.' }
+    ]
+  },
+  {
+    name: 'Carlos', age: 34, origin: 'Madrid, Spagna', budget: '€€', duration: '6 giorni', emoji: '🌊', type: 'Turista balneare',
+    story: 'Carlos vuole una vacanza rilassante con la sua compagna: giornate di mare, bagni e cene tranquille. Vorrebbe anche visitare un centro storico caratteristico.',
+    interests: 'Spiagge, nuoto, sole e passeggiate serali.', needs: 'Mare raggiungibile facilmente e una località con servizi e ristoranti.',
+    options: [
+      { name: 'Cefalù', country: 'Sicilia · Italia', emoji: '🏝️', correct: true, feedback: 'Perfetta per Carlos: Cefalù unisce spiaggia, mare e un centro storico piacevole da visitare la sera.' },
+      { name: 'Milano', country: 'Lombardia · Italia', emoji: '🛍️', feedback: 'Milano è una meta urbana per cultura e shopping, ma Carlos cerca una vacanza di mare e relax.' },
+      { name: 'Praga', country: 'Repubblica Ceca', emoji: '🏰', feedback: 'Praga offre un centro storico bellissimo, ma non il mare che Carlos vuole vivere ogni giorno.' },
+      { name: 'Dolomiti', country: 'Italia', emoji: '🏔️', feedback: 'Le Dolomiti sono una meta di montagna, mentre Carlos desidera spiaggia, bagni e passeggiate sul mare.' }
+    ]
+  },
+  {
+    name: 'Amina', age: 28, origin: 'Marsiglia, Francia', budget: '€€€', duration: '5 giorni', emoji: '🏺', type: 'Turista culturale',
+    story: 'Amina ama scoprire come le diverse civiltà hanno lasciato tracce nei luoghi che visita. È curiosa di archeologia, mosaici e storia antica.',
+    interests: 'Siti archeologici, teatri antichi, musei e storia del Mediterraneo.', needs: 'Visite guidate o spiegazioni chiare per capire il contesto storico.',
+    options: [
+      { name: 'Ibiza', country: 'Isole Baleari · Spagna', emoji: '🎉', feedback: 'Ibiza è conosciuta soprattutto per mare e divertimento; Amina cerca siti archeologici e testimonianze della storia antica.' },
+      { name: 'Taormina', country: 'Sicilia · Italia', emoji: '🏛️', correct: true, feedback: 'Ottima scelta! Il teatro antico di Taormina e il contesto storico siciliano incontrano la passione di Amina per archeologia e Mediterraneo.' },
+      { name: 'Amsterdam', country: 'Paesi Bassi', emoji: '🚲', feedback: 'Amsterdam ha musei importanti, ma Amina è particolarmente interessata ai siti archeologici e alla storia antica mediterranea.' },
+      { name: 'Rimini', country: 'Emilia-Romagna · Italia', emoji: '☀️', feedback: 'Rimini offre mare e anche testimonianze romane, ma Taormina si abbina meglio alla curiosità di Amina per il teatro antico e la storia mediterranea.' }
+    ]
+  },
+  {
+    name: 'Oliver', age: 38, origin: 'Bristol, Regno Unito', budget: '€€', duration: '4 giorni', emoji: '🚤', type: 'Turista culturale',
+    story: 'Oliver viaggia da solo e ama fotografare città con una forte identità. Vuole esplorare a piedi, osservare l’architettura e scoprire scorci insoliti.',
+    interests: 'Architettura, fotografia, canali, piazze e quartieri storici.', needs: 'Una città visitabile a piedi e con molte occasioni per fotografare.',
+    options: [
+      { name: 'Venezia', country: 'Veneto · Italia', emoji: '🚤', correct: true, feedback: 'Esatto! Venezia offre canali, ponti e architetture riconoscibili a ogni angolo: è perfetta per il viaggio fotografico di Oliver.' },
+      { name: 'Taormina', country: 'Sicilia · Italia', emoji: '🌋', feedback: 'Taormina ha scorci bellissimi, ma Oliver desidera soprattutto una città con canali, architetture e quartieri storici da esplorare a piedi.' },
+      { name: 'Cortina d’Ampezzo', country: 'Veneto · Italia', emoji: '🏔️', feedback: 'Cortina è una meta alpina; per fotografie urbane e architettura storica, Venezia corrisponde meglio ai gusti di Oliver.' },
+      { name: 'Ibiza', country: 'Isole Baleari · Spagna', emoji: '🌅', feedback: 'Ibiza offre paesaggi marini, ma il viaggio fotografico di Oliver è pensato per architetture e scorci di una città storica.' }
+    ]
+  }
+];
+
+let currentIndex = 0;
+let selectedOption = null;
+let score = 0;
+let answered = false;
+let results = Array(tourists.length).fill(null);
+
+const $ = (id) => document.getElementById(id);
+const progressBar = document.querySelector('[role="progressbar"]');
+const destinationGrid = $('destination-grid');
+
+function updateScore() {
+  score = results.filter(result => result === true).length;
+  const wrong = results.filter(result => result === false).length;
+  $('score-live').textContent = `✅ ${score} giuste · ❌ ${wrong} sbagliate`;
+}
+
+function renderTourist() {
+  const tourist = tourists[currentIndex];
+  selectedOption = null;
+  answered = false;
+  $('progress-text').textContent = `Turista ${currentIndex + 1} di ${tourists.length}`;
+  updateScore();
+  const progress = Math.round((currentIndex / tourists.length) * 100);
+  $('progress-fill').style.width = `${progress}%`;
+  progressBar.setAttribute('aria-valuenow', String(currentIndex));
+  $('profile-emoji').textContent = tourist.emoji;
+  $('profile-type').textContent = tourist.type.toLocaleUpperCase('it-IT');
+  $('profile-name').textContent = tourist.name;
+  $('profile-story').textContent = tourist.story;
+  $('profile-interests').textContent = tourist.interests;
+  $('profile-needs').textContent = tourist.needs;
+  $('profile-facts').replaceChildren();
+
+  [
+    ['🎂', String(tourist.age) + (typeof tourist.age === 'number' ? ' anni' : '')],
+    ['📍', tourist.origin],
+    ['💶', 'Budget ' + tourist.budget],
+    ['🗓️', tourist.duration]
+  ].forEach(([icon, text]) => {
+    const pill = document.createElement('span');
+    pill.className = 'fact-pill';
+    pill.textContent = `${icon} ${text}`;
+    $('profile-facts').appendChild(pill);
+  });
+
+  destinationGrid.replaceChildren();
+  tourist.options.forEach((destination, index) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'destination-card';
+    card.setAttribute('aria-pressed', 'false');
+    card.setAttribute('aria-label', `${destination.name}, ${destination.country}`);
+
+    const emoji = document.createElement('span');
+    emoji.className = 'destination-emoji';
+    emoji.setAttribute('aria-hidden', 'true');
+    emoji.textContent = destination.emoji;
+    const name = document.createElement('span');
+    name.className = 'destination-name';
+    name.textContent = destination.name;
+    const country = document.createElement('span');
+    country.className = 'destination-country';
+    country.textContent = destination.country;
+    card.append(emoji, name, country);
+    card.addEventListener('click', () => selectDestination(index));
+    destinationGrid.appendChild(card);
+  });
+
+  $('feedback').hidden = true;
+  $('feedback').className = 'feedback';
+  $('confirm-button').hidden = false;
+  $('confirm-button').disabled = true;
+  $('confirm-button').textContent = 'Conferma la destinazione →';
+  $('next-button').hidden = true;
+}
+
+function selectDestination(index) {
+  if (answered) return;
+  enableExitWarning();
+  selectedOption = index;
+  $('feedback').hidden = true;
+  $('confirm-button').hidden = false;
+  $('confirm-button').textContent = 'Conferma la destinazione →';
+  $('next-button').hidden = true;
+  Array.from(destinationGrid.children).forEach((card, cardIndex) => {
+    card.setAttribute('aria-pressed', String(cardIndex === index));
+  });
+  $('confirm-button').disabled = false;
+}
+
+function confirmDestination() {
+  if (selectedOption === null || answered) return;
+  const tourist = tourists[currentIndex];
+  const destination = tourist.options[selectedOption];
+  const feedback = $('feedback');
+  const correct = Boolean(destination.correct);
+  answered = true;
+  results[currentIndex] = correct;
+  updateScore();
+  const completed = currentIndex + 1;
+  $('progress-fill').style.width = `${Math.round((completed / tourists.length) * 100)}%`;
+  progressBar.setAttribute('aria-valuenow', String(completed));
+  const correctDestination = tourist.options.find(option => option.correct);
+  feedback.textContent = correct
+    ? `✅ Risposta giusta! +1 punto. ${destination.feedback}`
+    : `❌ Risposta sbagliata. ${destination.feedback} La destinazione giusta è ${correctDestination.name}. Puoi proseguire con il quiz.`;
+  feedback.className = `feedback ${correct ? 'good' : 'try-again'}`;
+  feedback.hidden = false;
+  Array.from(destinationGrid.children).forEach(card => { card.disabled = true; });
+  $('confirm-button').hidden = true;
+  $('confirm-button').disabled = true;
+  $('next-button').hidden = false;
+  $('next-button').textContent = currentIndex === tourists.length - 1 ? 'Vedi il risultato finale →' : 'Prossimo turista →';
+}
+
+function showResults() {
+  const finalCard = $('final-card');
+  $('profile-card').hidden = true;
+  document.querySelector('.choices-area').hidden = true;
+  $('progress-text').textContent = 'Sfida completata!';
+  updateScore();
+  $('progress-fill').style.width = '100%';
+  progressBar.setAttribute('aria-valuenow', String(tourists.length));
+  $('final-score').textContent = String(score);
+  $('final-correct').textContent = `${score} ${score === 1 ? 'risposta giusta' : 'risposte giuste'} su ${tourists.length}`;
+  const wrong = results.filter(result => result === false).length;
+  $('final-wrong').textContent = `${wrong} ${wrong === 1 ? 'risposta sbagliata' : 'risposte sbagliate'}`;
+
+  let emoji = '🧭';
+  let message = 'Buon inizio! Rileggi i profili e prova a collegare interessi, budget, durata ed esigenze con la destinazione più adatta.';
+  if (score >= 10) {
+    emoji = '🏆';
+    message = 'Fantastico! Sai leggere con attenzione i bisogni dei viaggiatori e proporre mete davvero adatte.';
+  } else if (score >= 7) {
+    emoji = '🌟';
+    message = 'Ottimo lavoro! Hai colto molti indizi. Per migliorare ancora, considera sempre anche budget, durata ed esigenze pratiche.';
+  } else if (score >= 4) {
+    emoji = '🧳';
+    message = 'Stai costruendo il tuo occhio da professionista! Ogni profilo offre indizi: usa interessi e necessità per motivare la scelta.';
+  }
+  $('final-emoji').textContent = emoji;
+  $('final-message').textContent = message;
+  finalCard.hidden = false;
+  finalCard.focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextTourist() {
+  if (!answered) return;
+  if (currentIndex >= tourists.length - 1) {
+    showResults();
+    return;
+  }
+  currentIndex += 1;
+  renderTourist();
+  $('profile-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function warnBeforeLeaving(event) {
+  event.preventDefault();
+  event.returnValue = true;
+}
+
+// Il browser mostra il proprio avviso dopo la prima interazione con il quiz.
+// L'avviso resta attivo anche sul risultato finale per evitare chiusure accidentali.
+let exitWarningEnabled = false;
+function enableExitWarning() {
+  if (exitWarningEnabled) return;
+  window.addEventListener('beforeunload', warnBeforeLeaving);
+  exitWarningEnabled = true;
+}
+
+$('confirm-button').addEventListener('click', confirmDestination);
+$('next-button').addEventListener('click', nextTourist);
+renderTourist();
+
+  </script>
+</body>
+</html>

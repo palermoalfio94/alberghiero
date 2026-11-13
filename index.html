@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf5f3">
+  <meta name="description" content="Attività interattive di accoglienza turistica per gli studenti dell'istituto alberghiero.">
+  <title>Accoglienza turistica · Attività per gli studenti</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 56px 20px; background: linear-gradient(135deg, #edf5f3, #f4f2fc); color: #17324d; font: 17px/1.6 Arial, Helvetica, sans-serif; }
+    main { max-width: 880px; margin: auto; }
+    .eyebrow { margin: 0 0 12px; color: #426d70; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+    h1 { margin: 0 0 16px; font-size: clamp(32px, 6vw, 50px); line-height: 1.15; }
+    .intro { max-width: 620px; margin: 0 0 32px; color: #536579; }
+    .activities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .card { display: flex; flex-direction: column; padding: 28px; border: 1px solid #dce7e8; border-radius: 20px; background: white; box-shadow: 0 8px 24px #17324d0a; }
+    .icon { font-size: 38px; }
+    h2 { margin: 14px 0 10px; font-size: 25px; line-height: 1.25; }
+    .card p { margin: 0 0 24px; color: #536579; }
+    a { display: block; margin-top: auto; padding: 13px 18px; border-radius: 10px; background: #276c8e; color: white; text-decoration: none; text-align: center; font-weight: 700; }
+    .destination a { background: #6654dc; }
+    a:hover { filter: brightness(.9); }
+    a:focus-visible { outline: 3px solid #17324d; outline-offset: 4px; }
+    footer { margin-top: 30px; color: #536579; font-size: 14px; }
+    @media (max-width: 620px) { body { padding: 32px 16px; } .activities { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Istituto alberghiero · Spazio studenti</p>
+      <h1>Accoglienza turistica</h1>
+      <p class="intro">Esplora il mondo del turismo con due attività interattive. Scegli da quale iniziare!</p>
+    </header>
+    <div class="activities">
+      <article class="card">
+        <span class="icon" aria-hidden="true">🧳</span>
+        <h2>Che tipo di turista sei?</h2>
+        <p>Rispondi alle domande e scopri il tuo profilo di turista.</p>
+        <a href="Accoglienza/che-tipo-di-turista-sei.html">Scopri il tuo profilo</a>
+      </article>
+      <article class="card destination">
+        <span class="icon" aria-hidden="true">🧭</span>
+        <h2>Trova la destinazione perfetta!</h2>
+        <p>Conosci i viaggiatori e scegli la destinazione più adatta ai loro interessi e alle loro esigenze.</p>
+        <a href="Accoglienza/LaDestinazioneGiusta.html">Scegli la destinazione</a>
+      </article>
+    </div>
+    <footer>Attività didattiche di accoglienza turistica · Prof. Alfio Palermo</footer>
+  </main>
+</body>
+</html>

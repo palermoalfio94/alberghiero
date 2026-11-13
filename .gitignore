@@ -1,0 +1,10 @@
+# Pubblica soltanto i siti e i file di configurazione elencati qui.
+/*
+!/.gitignore
+!/.nojekyll
+!/index.html
+!/README.md
+!/Accoglienza/
+/Accoglienza/*
+!/Accoglienza/LaDestinazioneGiusta.html
+!/Accoglienza/che-tipo-di-turista-sei.html

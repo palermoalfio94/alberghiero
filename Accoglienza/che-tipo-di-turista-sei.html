@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf6f4">
+  <title>Che tipo di turista sei?</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17324d;
+      --muted: #536579;
+      --blue: #276c8e;
+      --blue-dark: #1c5876;
+      --line: #dce7e8;
+      --paper: #fff;
+      --background: #edf5f3;
+      --mint: #e9f5f1;
+      --error: #a12626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 26px 14px 44px;
+      color: var(--ink);
+      background: linear-gradient(135deg, #e8f3f3, #f8f5ed);
+      font: 16px/1.55 Arial, Helvetica, sans-serif;
+    }
+    main { width: min(100%, 760px); margin: 0 auto; }
+    .panel, .question, .result {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(23, 50, 77, .06);
+    }
+    .intro { padding: 28px; margin-bottom: 17px; }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 5vw, 39px); line-height: 1.15; }
+    .lead, .description { color: var(--muted); }
+    .lead { margin: 0; }
+    .note { margin: 17px 0 0; padding: 12px 14px; background: var(--mint); border-radius: 10px; font-size: 14px; }
+    .progress-row { display: flex; justify-content: space-between; gap: 12px; margin: 17px 1px 8px; color: var(--blue); font-size: 14px; font-weight: 700; }
+    .progress-track { height: 8px; overflow: hidden; background: #e8eff0; border-radius: 99px; }
+    .progress-fill { width: 0; height: 100%; background: #53a391; border-radius: inherit; transition: width .2s ease; }
+    .question { margin: 12px 0; padding: 20px 22px; }
+    fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+    legend { width: 100%; margin-bottom: 12px; font-weight: 700; }
+    .option { display: flex; align-items: flex-start; gap: 10px; margin: 3px 0; padding: 9px 10px; border-radius: 9px; cursor: pointer; }
+    .option:hover { background: #f1f7f8; }
+    .option:focus-within { outline: 2px solid #82b8c9; }
+    input[type="radio"] { flex: none; margin: 4px 0 0; accent-color: var(--blue); }
+    button { width: 100%; margin-top: 17px; padding: 15px 20px; border: 0; border-radius: 12px; background: var(--blue); color: white; font-size: 17px; font-weight: 700; cursor: pointer; }
+    button:hover { background: var(--blue-dark); }
+    button:focus-visible { outline: 3px solid #17324d; outline-offset: 3px; }
+    .error { margin: 12px 2px; color: var(--error); font-weight: 700; }
+    .result { display: none; padding: 30px 26px; text-align: center; }
+    .result-icon { font-size: 44px; }
+    .result h2 { margin: 8px 0 12px; color: var(--blue); font-size: clamp(25px, 5vw, 35px); line-height: 1.2; }
+    .result p { max-width: 550px; margin: 0 auto; color: var(--muted); font-size: 18px; }
+    .result .small { margin-top: 18px; font-size: 14px; }
+    .restart { max-width: 330px; margin: 22px auto 0; }
+    [hidden] { display: none !important; }
+    @media (max-width: 520px) {
+      body { padding: 14px 10px 28px; }
+      .intro { padding: 22px 18px; }
+      .question { padding: 17px 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="panel intro">
+      <h1>Che tipo di turista sei?</h1>
+      <p class="lead">Scopri quale stile di viaggio ti rappresenta. Scegli la risposta che preferisci: non ci sono risposte giuste o sbagliate!</p>
+      <p class="note">Immagina di essere davvero in vacanza e rispondi con calma. Il quiz contiene 12 domande e richiede circa 5-8 minuti; con la discussione finale in classe, l’attività dura circa 15 minuti.</p>
+      <div class="progress-row"><span id="progress-label">0 di 12 risposte</span><span id="progress-percent">0%</span></div>
+      <div class="progress-track" role="progressbar" aria-label="Completamento del quiz" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </header>
+
+    <form id="quiz" novalidate>
+      <div id="questions"></div>
+      <p class="error" id="error" role="alert" hidden></p>
+      <button type="submit">Scopri il mio profilo</button>
+    </form>
+
+    <section class="result" id="result" aria-live="polite" tabindex="-1">
+      <div class="result-icon" aria-hidden="true">✈️</div>
+      <p>Il tuo profilo è:</p>
+      <h2 id="profile-name"></h2>
+      <p id="profile-description"></p>
+      <p class="small">Questo risultato racconta le preferenze che hai espresso oggi: ogni modo di viaggiare può essere speciale!</p>
+      <button class="restart" id="restart" type="button">Ricomincia il quiz</button>
+    </section>
+  </main>
+
+  <script>
+    'use strict';
+
+    // Ogni risposta vale un punto per la tipologia associata.
+    const profiles = {
+      culturale: {
+        name: 'TURISTA CULTURALE',
+        description: 'Ti piace scoprire la storia, l’arte e le tradizioni dei luoghi. Ogni viaggio è una nuova occasione per imparare.'
+      },
+      balneare: {
+        name: 'TURISTA BALNEARE',
+        description: 'La tua vacanza ideale profuma di mare: ami la spiaggia, il sole e i momenti di relax in riva all’acqua.'
+      },
+      naturalistico: {
+        name: 'TURISTA NATURALISTICO',
+        description: 'Ti senti a casa tra paesaggi, animali e sentieri. Ti piace esplorare la natura e rispettare l’ambiente.'
+      },
+      enogastronomico: {
+        name: 'TURISTA ENOGASTRONOMICO',
+        description: 'Per conoscere un posto parti dai suoi sapori: ami assaggiare piatti tipici e scoprire le tradizioni a tavola.'
+      },
+      sportivo: {
+        name: 'TURISTA SPORTIVO/AVVENTURA',
+        description: 'In vacanza cerchi movimento e nuove sfide. Ti piacciono le attività all’aperto e le esperienze adrenaliniche.'
+      },
+      divertimento: {
+        name: 'TURISTA DEL DIVERTIMENTO',
+        description: 'Vuoi vivere momenti pieni di energia, giochi e risate. Per te una bella vacanza è un’esperienza da condividere.'
+      }
+    };
+
+    const quiz = [
+      { question: 'Se potessi scegliere subito una vacanza, quale sceglieresti?', options: [
+        ['Visitare una città ricca di monumenti', 'culturale'], ['Rilassarmi su una spiaggia', 'balneare'], ['Esplorare un parco naturale', 'naturalistico'], ['Fare un tour tra mercati e prodotti tipici', 'enogastronomico'], ['Partire per un’avventura sportiva', 'sportivo'], ['Andare in un grande parco divertimenti', 'divertimento']
+      ] },
+      { question: 'Quale destinazione ti attira di più?', options: [
+        ['Roma, con i suoi musei e monumenti', 'culturale'], ['Un’isola con mare cristallino', 'balneare'], ['Le montagne e i loro sentieri', 'naturalistico'], ['Una zona famosa per le sue specialità', 'enogastronomico'], ['Un luogo dove provare rafting o arrampicata', 'sportivo'], ['Una città con parchi a tema e attrazioni', 'divertimento']
+      ] },
+      { question: 'Che cosa fotograferesti più volentieri?', options: [
+        ['Un’opera d’arte o un edificio storico', 'culturale'], ['Un tramonto sul mare', 'balneare'], ['Un animale incontrato durante una passeggiata', 'naturalistico'], ['Un piatto tipico appena arrivato in tavola', 'enogastronomico'], ['Un momento emozionante durante una sfida', 'sportivo'], ['Una giostra colorata o una scena divertente', 'divertimento']
+      ] },
+      { question: 'Hai una giornata libera in viaggio. Come la trascorri?', options: [
+        ['Visito un museo e il centro storico', 'culturale'], ['Faccio il bagno e sto in spiaggia', 'balneare'], ['Cammino in un bosco o in un parco', 'naturalistico'], ['Visito un mercato e assaggio specialità locali', 'enogastronomico'], ['Provo un’attività sportiva nuova', 'sportivo'], ['Cerco giochi, spettacoli e attrazioni', 'divertimento']
+      ] },
+      { question: 'Che cosa non può mancare nella tua vacanza ideale?', options: [
+        ['Una visita interessante e qualcosa da imparare', 'culturale'], ['Mare e tempo per riposarmi', 'balneare'], ['Aria aperta e bei paesaggi', 'naturalistico'], ['Cibo buono e prodotti del posto', 'enogastronomico'], ['Attività fisica e un po’ di adrenalina', 'sportivo'], ['Risate e tante cose da fare', 'divertimento']
+      ] },
+      { question: 'Quale attività sceglieresti per prima?', options: [
+        ['Visitare un museo', 'culturale'], ['Andare in spiaggia', 'balneare'], ['Fare trekking nella natura', 'naturalistico'], ['Mangiare in un ristorante tipico', 'enogastronomico'], ['Provare uno sport d’avventura', 'sportivo'], ['Passare la giornata in un parco divertimenti', 'divertimento']
+      ] },
+      { question: 'Quale souvenir porteresti a casa?', options: [
+        ['Una cartolina di un monumento o di un’opera', 'culturale'], ['Una conchiglia o una foto del mare', 'balneare'], ['Un oggetto ispirato alla natura del luogo', 'naturalistico'], ['Un prodotto tipico da condividere', 'enogastronomico'], ['Una maglietta legata allo sport che ho provato', 'sportivo'], ['Una foto o un gadget dell’attrazione più divertente', 'divertimento']
+      ] },
+      { question: 'Quale esperienza racconteresti più volentieri agli amici?', options: [
+        ['La storia curiosa di un luogo che ho visitato', 'culturale'], ['Una giornata speciale al mare', 'balneare'], ['Un paesaggio o un animale visto da vicino', 'naturalistico'], ['Un piatto buonissimo che ho assaggiato', 'enogastronomico'], ['Una discesa, una gara o una sfida superata', 'sportivo'], ['Un’attrazione o uno spettacolo esilarante', 'divertimento']
+      ] },
+      { question: 'Quale guida o mappa apriresti per prima?', options: [
+        ['Quella dei monumenti e dei luoghi storici', 'culturale'], ['Quella delle spiagge e delle baie', 'balneare'], ['Quella dei parchi e dei percorsi naturali', 'naturalistico'], ['Quella dei ristoranti e delle specialità locali', 'enogastronomico'], ['Quella delle attività sportive e avventurose', 'sportivo'], ['Quella delle attrazioni e degli spettacoli', 'divertimento']
+      ] },
+      { question: 'Dopo una giornata di viaggio, quale serata preferisci?', options: [
+        ['Una passeggiata tra piazze e palazzi storici', 'culturale'], ['Un po’ di relax vicino al mare', 'balneare'], ['Una serata tranquilla immerso nel paesaggio', 'naturalistico'], ['Una cena con ricette della tradizione', 'enogastronomico'], ['Una partita o un’attività dinamica', 'sportivo'], ['Uno spettacolo o una serata piena di giochi', 'divertimento']
+      ] },
+      { question: 'Quale regalo di viaggio ti farebbe più piacere?', options: [
+        ['Un libro illustrato sulla storia del posto', 'culturale'], ['Un accessorio per la spiaggia', 'balneare'], ['Una borraccia o una guida ai sentieri', 'naturalistico'], ['Una specialità da assaggiare a casa', 'enogastronomico'], ['Un accessorio per lo sport', 'sportivo'], ['Un biglietto per una nuova attrazione', 'divertimento']
+      ] },
+      { question: 'È l’ultimo giorno: quale attività scegli?', options: [
+        ['Rivedere il monumento che mi è piaciuto di più', 'culturale'], ['Fare un ultimo bagno', 'balneare'], ['Godermi ancora un panorama naturale', 'naturalistico'], ['Comprare qualcosa di tipico da mangiare', 'enogastronomico'], ['Fare un’ultima attività sportiva', 'sportivo'], ['Ripetere la mia attrazione preferita', 'divertimento']
+      ] }
+    ];
+
+    const form = document.getElementById('quiz');
+    const questionsContainer = document.getElementById('questions');
+    const errorMessage = document.getElementById('error');
+    const progressBar = document.querySelector('[role="progressbar"]');
+    const progressFill = document.getElementById('progress-fill');
+
+    function renderQuestions() {
+      quiz.forEach(function(item, questionIndex) {
+        const section = document.createElement('section');
+        section.className = 'question';
+        const fieldset = document.createElement('fieldset');
+        const legend = document.createElement('legend');
+        legend.textContent = (questionIndex + 1) + '. ' + item.question;
+        fieldset.appendChild(legend);
+
+        item.options.forEach(function(option, optionIndex) {
+          const label = document.createElement('label');
+          label.className = 'option';
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'q' + questionIndex;
+          radio.value = String(optionIndex);
+          radio.addEventListener('change', updateProgress);
+          const text = document.createElement('span');
+          text.textContent = option[0];
+          label.append(radio, text);
+          fieldset.appendChild(label);
+        });
+
+        section.appendChild(fieldset);
+        questionsContainer.appendChild(section);
+      });
+    }
+
+    function updateProgress() {
+      const answered = quiz.reduce(function(total, _, index) {
+        return total + (form.querySelector('input[name="q' + index + '"]:checked') ? 1 : 0);
+      }, 0);
+      const percent = Math.round(answered / quiz.length * 100);
+      document.getElementById('progress-label').textContent = answered + ' di ' + quiz.length + ' risposte';
+      document.getElementById('progress-percent').textContent = percent + '%';
+      progressFill.style.width = percent + '%';
+      progressBar.setAttribute('aria-valuenow', String(answered));
+    }
+
+    function calculateProfile(answers) {
+      const scores = Object.keys(profiles).reduce(function(result, key) {
+        result[key] = 0;
+        return result;
+      }, {});
+      answers.forEach(function(optionIndex, questionIndex) {
+        const profileKey = quiz[questionIndex].options[optionIndex][1];
+        scores[profileKey] += 1;
+      });
+
+      const maxScore = Math.max.apply(null, Object.values(scores));
+      const leaders = Object.keys(scores).filter(function(key) { return scores[key] === maxScore; });
+      // Spareggio: tra i profili a pari punteggio prevale quello scelto più di recente.
+      let winner = leaders[0];
+      if (leaders.length > 1) {
+        for (let i = answers.length - 1; i >= 0; i--) {
+          const recentProfile = quiz[i].options[answers[i]][1];
+          if (leaders.includes(recentProfile)) {
+            winner = recentProfile;
+            break;
+          }
+        }
+      }
+      return profiles[winner];
+    }
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      errorMessage.hidden = true;
+      const answers = [];
+      for (let i = 0; i < quiz.length; i++) {
+        const selected = form.querySelector('input[name="q' + i + '"]:checked');
+        if (!selected) {
+          errorMessage.textContent = 'Rispondi a tutte le domande prima di continuare.';
+          errorMessage.hidden = false;
+          form.querySelector('input[name="q' + i + '"]').focus();
+          return;
+        }
+        answers.push(Number(selected.value));
+      }
+
+      const profile = calculateProfile(answers);
+      document.getElementById('profile-name').textContent = profile.name;
+      document.getElementById('profile-description').textContent = profile.description;
+      form.hidden = true;
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('restart').addEventListener('click', function() {
+      form.reset();
+      document.getElementById('result').style.display = 'none';
+      form.hidden = false;
+      errorMessage.hidden = true;
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelector('input[name="q0"]').focus();
+    });
+
+    renderQuestions();
+  </script>
+</body>
+</html>
