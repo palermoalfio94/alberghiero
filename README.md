@@ -7,7 +7,7 @@ Sito: https://palermoalfio94.github.io/alberghiero/
 - **Che tipo di turista sei?** — questionario sul profilo del turista.
 - **Trova la destinazione perfetta!** — attività di scelta della destinazione.
 - **Missione valigia** — quattro clienti, oggetti da scegliere e proposte di viaggio da completare.
-- **Parole in viaggio** — cruciverba con 15 parole e cercaparole con altre 15 parole, con schede PDF e soluzioni.
+- **Parole in viaggio** — cruciverba con 15 parole e cercaparole con altre 15 parole, con schede PDF per gli studenti.
 
 ## Pubblicazione
 
