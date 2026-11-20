@@ -1,6 +1,7 @@
 # Pubblica soltanto i siti e i file di configurazione elencati qui.
 /*
 !/.gitignore
+!/.gitattributes
 !/.nojekyll
 !/index.html
 !/README.md
@@ -9,3 +10,8 @@
 !/Accoglienza/LaDestinazioneGiusta.html
 !/Accoglienza/che-tipo-di-turista-sei.html
 !/Accoglienza/missione-valigia.html
+!/Accoglienza/parole-in-viaggio.html
+!/Accoglienza/materiali-turismo/
+/Accoglienza/materiali-turismo/*
+!/Accoglienza/materiali-turismo/turismo-schede-studenti.pdf
+!/Accoglienza/materiali-turismo/turismo-soluzioni.pdf
